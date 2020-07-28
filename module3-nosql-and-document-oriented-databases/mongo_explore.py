@@ -28,13 +28,21 @@ print(db.list_collection_names())
 customers = db.customers
 print(customers.count_documents({}))
 
+#
+#### Write JSON Data from RPG DB to MongoDB
+#
 
+# Read the JSON file (copied from: https://raw.githubusercontent.com/LambdaSchool/Django-RPG/master/testdata.json)
 with open('test_data_json.txt') as json_file:
     rpg_data = json.load(json_file)
 
+# Create an rpg_data database
 my_db = client.rpg_data
+
+# Create a characters collection in the rpg_data DB
 character_table = my_db.characters
 
+# Insert the JSON data into characters collection
 character_table.insert_many(rpg_data)
 print(character_table.count_documents({}))
 
