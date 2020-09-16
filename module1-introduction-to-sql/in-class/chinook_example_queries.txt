@@ -1,0 +1,74 @@
+-- Select all rows and columns from albums
+SELECT *
+FROM albums;
+--LIMIT 5;  -- limit to 5 rows
+
+-- Get a list of all customers from Brazil
+SELECT 
+  CustomerId,
+  FirstName,
+  LastName,
+  Country
+FROM customers
+WHERE Country='Brazil';
+--WHERE Country IN ('Brazil', 'USA'); -- check multiple countries
+
+-- How many different countries do our customers come from?
+SELECT 
+  COUNT(*), -- Don't use this!
+  COUNT(Country),
+  COUNT(DISTINCT Country)
+FROM customers;
+
+-- Find the average invoice total for each customer
+SELECT 
+  CustomerId,
+  AVG(Total)
+FROM invoices
+GROUP BY CustomerId;
+
+-- Which customers have an average invoice > 6
+SELECT 
+  CustomerId,
+  AVG(Total) as AvgTotal
+FROM invoices
+GROUP BY CustomerId
+HAVING AvgTotal >= 6;
+
+-- Introducing JOINS by adding Customer Name to previous query
+SELECT 
+  inv.CustomerId,
+  cust.FirstName,
+  cust.LastName,
+  AVG(inv.Total) as AvgTotal
+FROM invoices as inv
+LEFT JOIN customers as cust
+ON inv.CustomerId = cust.CustomerId
+GROUP BY inv.CustomerId
+HAVING AvgTotal >= 6;
+
+-- Which artist has the most albums?
+SELECT
+  alb.ArtistId,
+  art.Name as ArtistName,
+  COUNT(alb.AlbumId) as NumAlbums
+FROM albums as alb
+JOIN artists as art 
+ON alb.ArtistId = art.ArtistId
+GROUP BY ArtistName
+ORDER BY NumAlbums DESC;
+
+-- Subqueries Example (Multiple Aggregations)
+-- What if you wanted to know the average number of albums for every artist?
+SELECT AVG(NumAlbums)
+FROM (
+  SELECT
+	  alb.ArtistId,
+	  art.Name as ArtistName,
+	  COUNT(alb.AlbumId) as NumAlbums
+  FROM albums as alb
+  JOIN artists as art 
+  ON alb.ArtistId = art.ArtistId
+  GROUP BY ArtistName
+  ORDER BY NumAlbums DESC
+) subq
